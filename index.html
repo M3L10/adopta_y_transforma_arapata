@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Adopta y transforma en Arapata | Métodos numéricos</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <header>
+        <h1>🐾 Adopta y transforma en Arapata</h1>
+        <p>Simulación matemática de una campaña de adopción responsable de perros sin hogar en la población de Arapata, municipio de Coripata, departamento de La Paz. Análisis mediante la solución exacta, Heun y Runge–Kutta de cuarto orden.</p>
+    </header>
+
+    <main>
+        <!-- Sección A: Problema y contexto -->
+        <section id="a">
+            <h2>a) Problema y contexto</h2>
+            <p><b>Desafío:</b> Adopta y transforma: simulación matemática de una campaña de adopción responsable de perros sin hogar.</p>
+            <p><b>Comunidad beneficiaria:</b> la población de Arapata, ubicada en el municipio de Coripata, departamento de La Paz, Bolivia. La iniciativa busca aportar una herramienta de análisis para promover la adopción responsable y el bienestar de los perros sin hogar en la comunidad.</p>
+            <p><b>Problema específico:</b> en Arapata, la presencia de perros sin hogar o pendientes de adopción puede representar un desafío para el bienestar animal y la convivencia comunitaria. Para planificar acciones de adopción responsable es útil estudiar, mediante un modelo matemático, cómo podría variar esa población a lo largo del tiempo. Este proyecto no parte de un conteo oficial de perros de Arapata; por eso, los valores numéricos de la simulación son referenciales.</p>
+            <p><b>Relevancia:</b> el estudio se contextualiza en Arapata y puede servir como recurso académico para conversar sobre campañas de adopción, coordinación vecinal y cuidado responsable. Para convertir la simulación en una estimación de la situación real, será necesario recopilar datos locales sobre la cantidad de perros, adopciones y nuevos ingresos.</p>
+            <div class="formula"><b>Pregunta del desafío:</b> ¿Cómo podría cambiar, durante un periodo de 30 días, la cantidad de perros sin hogar o pendientes de adopción en la población de Arapata si se desarrollara una campaña de adopción responsable con una tasa de adopción proporcional constante, y qué tan bien aproximan los métodos de Heun y RK4 esa evolución?</div>
+            <p class="note"></p>
+        </section>
+
+        <!-- Sección B: Modelo matemático -->
+        <section id="b">
+            <h2>b) Modelo matemático</h2>
+            <div class="gridinfo">
+                <div><b>Variable dependiente</b><br>P(t): perros pendientes de adopción (perros).</div>
+                <div><b>Variable independiente</b><br>t: tiempo (días).</div>
+                <div><b>Parámetro</b><br>k: tasa proporcional de adopción (día⁻¹).</div>
+                <div><b>Condición inicial</b><br>P(0)=P₀, población inicial (perros).</div>
+            </div>
+            <div class="formula">dP/dt = −kP(t), &nbsp; P(0)=P₀</div>
+            <p>Se usa una tasa proporcional porque, bajo el supuesto del modelo, cuanto mayor sea la cantidad de perros pendientes, mayor será la cantidad esperada de adopciones por unidad de tiempo. El signo negativo representa una disminución.</p>
+            
+            <h3>Supuestos</h3>
+            <ul>
+                <li>La tasa k permanece constante durante la simulación.</li>
+                <li>No ingresan nuevos perros al grupo modelado.</li>
+                <li>La disminución se debe únicamente a las adopciones.</li>
+                <li>La población se trata como una variable continua, por lo que pueden aparecer valores decimales.</li>
+            </ul>
+            
+            <p><b>Intervalo de simulación:</b> de t=0 a t=T días. Los parámetros iniciales son editables abajo.</p>
+            
+            <div class="controls">
+                <label>Población inicial P₀ (perros)<input id="p0" type="number" min="0" step="1" value="100"></label>
+                <label>Constante k (día⁻¹)<input id="k" type="number" min="0" step="0.001" value="0.05"></label>
+                <label>Tiempo final T (días)<input id="T" type="number" min="0" step="1" value="30"></label>
+                <label>Tamaño de paso base h (días)
+                    <select id="h">
+                        <option value="0.5">0.5</option>
+                        <option value="1">1</option>
+                        <option value="0.25">0.25</option>
+                        <option value="0.1">0.1</option>
+                    </select>
+                </label>
+            </div>
+            
+            <p><button id="run">Calcular y actualizar todos los apartados</button></p>
+            <div id="error" role="alert"></div>
+        </section>
+
+        <!-- Sección C: Solución analítica -->
+        <section id="c">
+            <h2>c) Solución analítica</h2>
+            <p>Partimos de la ecuación diferencial:</p>
+            <div class="formula">
+                dP/dt = −kP &nbsp; ⇒ &nbsp; dP/P = −k dt<br>
+                ∫(1/P)dP = −k∫dt<br>
+                ln|P| = −kt + C<br>
+                P(t)=Ce<sup>−kt</sup><br>
+                Como P(0)=P₀, entonces C=P₀.<br>
+                <b>Solución exacta: P(t)=P₀e<sup>−kt</sup>.</b>
+            </div>
+            <h3>Comprobación por sustitución</h3>
+            <div id="verification" class="formula"></div>
+        </section>
+
+        <!-- Sección D: Soluciones numéricas -->
+        <section id="d">
+            <h2>d) Soluciones numéricas</h2>
+            <h3>Método de Heun (Runge–Kutta de orden 2)</h3>
+            <div class="formula">
+                f(t,P)=−kP<br>
+                k₁=f(tₙ,Pₙ)<br>
+                P*=Pₙ+h·k₁<br>
+                k₂=f(tₙ+h,P*)<br>
+                <b>Pₙ₊₁=Pₙ+(h/2)(k₁+k₂)</b>
+            </div>
+            
+            <h3>Método clásico de Runge–Kutta de orden 4 (RK4)</h3>
+            <div class="formula">
+                k₁=f(tₙ,Pₙ)<br>
+                k₂=f(tₙ+h/2,Pₙ+h·k₁/2)<br>
+                k₃=f(tₙ+h/2,Pₙ+h·k₂/2)<br>
+                k₄=f(tₙ+h,Pₙ+h·k₃)<br>
+                <b>Pₙ₊₁=Pₙ+(h/6)(k₁+2k₂+2k₃+k₄)</b>
+            </div>
+            
+            <p>Ambos métodos utilizan los mismos P₀, k, intervalo y tamaño de paso en cada ensayo. Para comparar precisión se ejecutan dos ensayos: h y h/2.</p>
+        </section>
+
+        <!-- Sección E: Análisis comparativo -->
+        <section id="e">
+            <h2>e) Análisis comparativo</h2>
+            <div class="stats" id="stats"></div>
+            
+            <h3>Gráfica: solución exacta y métodos numéricos</h3>
+            <div class="legend">
+                <span><i class="dot exact"></i>Exacta</span>
+                <span><i class="dot heun"></i>Heun (h)</span>
+                <span><i class="dot rk"></i>RK4 (h)</span>
+            </div>
+            <svg id="chart" viewBox="0 0 900 400" role="img" aria-label="Comparación de las soluciones"></svg>
+            
+            <h3>Comparación de errores al final del intervalo</h3>
+            <div class="tablewrap">
+                <table id="errorTable">
+                    <thead>
+                        <tr>
+                            <th>Método</th>
+                            <th>Paso</th>
+                            <th>Valor numérico</th>
+                            <th>Valor exacto</th>
+                            <th>Error absoluto</th>
+                            <th>Error relativo (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            
+            <h3>Tabla de iteraciones — Heun y RK4 con h</h3>
+            <p class="muted">Se presenta cada iteración, no solo algunos días.</p>
+            <div class="tablewrap">
+                <table id="iterationTable">
+                    <thead>
+                        <tr>
+                            <th>n</th>
+                            <th>tₙ (días)</th>
+                            <th>Exacta</th>
+                            <th>Heun</th>
+                            <th>Error abs. Heun</th>
+                            <th>Error rel. Heun (%)</th>
+                            <th>RK4</th>
+                            <th>Error abs. RK4</th>
+                            <th>Error rel. RK4 (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Sección F: Interpretación y conclusiones -->
+        <section id="f">
+            <h2>f) Interpretación y conclusiones</h2>
+            <div id="interpretation"></div>
+        </section>
+
+        <!-- Sección de Procedimiento detallado -->
+        <section id="stepsSection">
+            <h2>Procedimiento detallado paso a paso</h2>
+            <p>Selecciona el desarrollo que deseas consultar. Los cálculos se actualizan con los parámetros ingresados.</p>
+            <label>Procedimiento
+                <select id="procedure">
+                    <option value="exact">Solución exacta y comprobación</option>
+                    <option value="heun">Método de Heun: todas las iteraciones</option>
+                    <option value="rk4">Método RK4: todas las iteraciones</option>
+                    <option value="errors">Cálculo de errores y comparación de h y h/2</option>
+                </select>
+            </label>
+            <div id="steps" class="formula steps"></div>
+        </section>
+    </main>
+
+    <footer>
+        Proyecto académico · Métodos Numéricos · Comunidad de referencia: Arapata, municipio de Coripata, departamento de La Paz, Bolivia. Modelo educativo con parámetros hipotéticos, no datos censales.
+    </footer>
+
+    <script src="script.js" defer></script>
+</body>
+</html>
